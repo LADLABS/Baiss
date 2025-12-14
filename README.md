@@ -17,7 +17,7 @@
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Avalonia](https://img.shields.io/badge/UI-Avalonia-B72834)](https://avaloniaui.net/)
-[![Made with <3](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F-red.svg)](https://github.com/tbeninnovation-mobileapp/baiss-open-source)
+[![Made with <3](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F-red.svg)](https://github.com/Tbeninnovation/Baiss)
 
 </div>
 
@@ -62,7 +62,7 @@ Ensure you have the following installed:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/tbeninnovation-mobileapp/Baiss.git
+   git clone https://github.com/Tbeninnovation/Baiss.git
    cd Baiss
    ```
 
