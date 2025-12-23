@@ -328,4 +328,9 @@ public class SettingsUseCase
         return _settingsService.SearchAndSaveExternalModelAsync(modelId);
     }
 
+	public Task RestartServerAsync(string modelType)
+	{
+		return _settingsService.RestartServerAsync(modelType);
+	}
+
 }

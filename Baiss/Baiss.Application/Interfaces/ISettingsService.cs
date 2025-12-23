@@ -82,4 +82,6 @@ public interface ISettingsService
 
     public void RefreshTreeStructure();
 
+    Task RestartServerAsync(string modelType);
+
 }

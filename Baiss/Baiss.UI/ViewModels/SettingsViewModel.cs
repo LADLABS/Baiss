@@ -3607,7 +3607,7 @@ public partial class SettingsViewModel : ViewModelBase, IDisposable
                         }
                     }
 
-                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         variant.IsDownloading = false;
                         variant.IsDownloaded = true;
@@ -3618,6 +3618,33 @@ public partial class SettingsViewModel : ViewModelBase, IDisposable
                             model.IsDownloaded = true;
                             model.ActiveProcessId = null;
                             UpdateDownloadedModelsByPurpose();
+
+                            var isChat = string.Equals(model.Usage, ModelPurposes.Chat, StringComparison.OrdinalIgnoreCase);
+                            var isEmbedding = string.Equals(model.Usage, ModelPurposes.Embedding, StringComparison.OrdinalIgnoreCase);
+                            // If usage is not explicitly Chat or Embedding, it's treated as both (see UpdateDownloadedModelsByPurpose)
+                            var isUnknown = !isChat && !isEmbedding;
+
+                            if (isChat || isUnknown)
+                            {
+                                var chatModel = DownloadedLocalChatModels.FirstOrDefault(m => m.Id == model.Id);
+                                if (chatModel != null)
+                                {
+                                    SelectedLocalChatModel = chatModel;
+                                    await SaveAIModelSettingsAsync(showSuccessToast: false);
+                                    await _settingsUseCase.RestartServerAsync("chat");
+                                }
+                            }
+
+                            if (isEmbedding || isUnknown)
+                            {
+                                var embeddingModel = DownloadedLocalEmbeddingModels.FirstOrDefault(m => m.Id == model.Id);
+                                if (embeddingModel != null)
+                                {
+                                    SelectedLocalEmbeddingModel = embeddingModel;
+                                    await SaveAIModelSettingsAsync(showSuccessToast: false);
+                                    await _settingsUseCase.RestartServerAsync("embedding");
+                                }
+                            }
                         }
                     });
 
@@ -3734,7 +3761,7 @@ public partial class SettingsViewModel : ViewModelBase, IDisposable
                         _logger.LogError(ex, "Failed to register model {ModelId} in database", model.Id);
                     }
 
-                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         model.IsDownloading = false;
                         model.IsDownloaded = true;
@@ -3744,10 +3771,31 @@ public partial class SettingsViewModel : ViewModelBase, IDisposable
                         // Update the purpose-based collections when download completes
                         UpdateDownloadedModelsByPurpose();
 
-                        // Auto-select embedding after download completes
-                        if (string.Equals(model.Usage, ModelPurposes.Embedding, StringComparison.OrdinalIgnoreCase))
+                        // Auto-select model after download completes
+                        var isChat = string.Equals(model.Usage, ModelPurposes.Chat, StringComparison.OrdinalIgnoreCase);
+                        var isEmbedding = string.Equals(model.Usage, ModelPurposes.Embedding, StringComparison.OrdinalIgnoreCase);
+                        var isUnknown = !isChat && !isEmbedding;
+
+                        if (isChat || isUnknown)
                         {
-                            SelectedLocalEmbeddingModel = model;
+                            var chatModel = DownloadedLocalChatModels.FirstOrDefault(m => m.Id == model.Id);
+                            if (chatModel != null)
+                            {
+                                SelectedLocalChatModel = chatModel;
+                                await SaveAIModelSettingsAsync(showSuccessToast: false);
+                                await _settingsUseCase.RestartServerAsync("chat");
+                            }
+                        }
+
+                        if (isEmbedding || isUnknown)
+                        {
+                            var embeddingModel = DownloadedLocalEmbeddingModels.FirstOrDefault(m => m.Id == model.Id);
+                            if (embeddingModel != null)
+                            {
+                                SelectedLocalEmbeddingModel = embeddingModel;
+                                await SaveAIModelSettingsAsync(showSuccessToast: false);
+                                await _settingsUseCase.RestartServerAsync("embedding");
+                            }
                         }
                     });
 
